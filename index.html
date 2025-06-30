@@ -1863,6 +1863,20 @@
       updateThemeIcon();
     });
   </script>
+
+<script>
+async function submitToSheet(data) {
+  await fetch("https://script.google.com/macros/s/AKfycbw7ckG4oNodB0Lau4S29Lqo9GnggDGA0m03-vTwDfiYnXjMDnzB5TR6yPezjf_8GVlNuA/exec", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(data)
+  });
+  alert("已送出行程資料！");
+}
+</script>
+
 </head>
 <body>
   <!-- 載入動畫 -->
