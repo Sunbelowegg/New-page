@@ -661,6 +661,13 @@
         align-items: stretch;
         z-index: 100;
       }
+      .pro-summary-route > div {
+        flex-wrap: wrap;
+      }
+      .photo-upload-btn {
+        margin-top: 6px;
+        margin-bottom: 6px;
+      }
     }
     
     /* 公里數彙整模態框樣式 */
@@ -1437,23 +1444,25 @@
             day.routes.forEach((route, routeIdx) => {
               if (route.customer || route.content) {
                 html += `<div class="pro-summary-route">`;
-                if (route.customer) html += `<b>客戶：</b>${route.customer}<br/>`;
-                if (route.content) html += `<b>內容：</b>${route.content}<br/>`;
+                // 客戶與拍照按鈕同一行
+                html += `<div style='display:flex;align-items:center;gap:8px;flex-wrap:wrap;'>`;
+                html += `<b>客戶：</b>${route.customer || ''}`;
+                // 拍照按鈕
+                const isDai = emp && emp.name === '戴誠志';
+                const showZhiYan = window.showZhiYan === true;
+                html += `<button class='photo-upload-btn' style='margin-left:6px;' onclick=\"onPhotoUpload('${emp.tableId}',${dayIdx},${routeIdx},'camera')\">📷 拍照</button>`;
+                if (isDai && showZhiYan) {
+                  html += `<button class='photo-upload-btn' style='margin-left:6px;' onclick=\"onPhotoUpload('${emp.tableId}',${dayIdx},${routeIdx},'upload')\">🗂️ 志眼</button>`;
+                }
+                html += `</div>`;
+                // 內容獨立一行
+                if (route.content) html += `<div style='margin-top:4px;'><b>內容：</b>${route.content}</div>`;
                 // 照片與地圖
                 if (route.photo) {
                   html += `<div style='margin:6px 0;display:flex;align-items:center;gap:8px;'>`;
-                  html += `<img src='${route.photo}' alt='照片' style='max-width:80px;max-height:60px;cursor:pointer;border-radius:6px;border:1px solid #ccc;' onclick="showRoutePhotoModal('${encodeURIComponent(route.photo)}')">`;
-                  html += `<button type='button' style='background:#dc3545;color:#fff;border:none;border-radius:4px;padding:4px 10px;cursor:pointer;font-size:0.9em;' onclick="deleteRoutePhoto('${emp.tableId}',${dayIdx},${routeIdx})">刪除</button>`;
+                  html += `<img src='${route.photo}' alt='照片' style='max-width:80px;max-height:60px;cursor:pointer;border-radius:6px;border:1px solid #ccc;' onclick=\"showRoutePhotoModal('${encodeURIComponent(route.photo)}')\">`;
+                  html += `<button type='button' style='background:#dc3545;color:#fff;border:none;border-radius:4px;padding:4px 10px;cursor:pointer;font-size:0.9em;' onclick=\"deleteRoutePhoto('${emp.tableId}',${dayIdx},${routeIdx})\">刪除</button>`;
                   html += `</div>`;
-                }
-                // 拍照/上傳按鈕
-                const isDai = emp && emp.name === '戴誠志';
-                const showZhiYan = window.showZhiYan === true;
-                // 拍照按鈕恢復可點擊
-                html += `<button class='photo-upload-btn' style='margin-top:4px;' onclick=\"onPhotoUpload('${emp.tableId}',${dayIdx},${routeIdx},'camera')\">📷 拍照</button>`;
-                // 只有戴誠志且 showZhiYan 才顯示志眼
-                if (isDai && showZhiYan) {
-                  html += `<button class='photo-upload-btn' style='margin-top:4px;margin-left:6px;' onclick=\"onPhotoUpload('${emp.tableId}',${dayIdx},${routeIdx},'upload')\">🗂️ 志眼</button>`;
                 }
                 if (route.lat && route.lng) {
                   html += `<a href='https://maps.google.com/?q=${route.lat},${route.lng}' target='_blank' style='color:#357abd;text-decoration:underline;font-size:0.95em;margin-left:10px;'>查看地圖</a>`;
@@ -2266,15 +2275,6 @@
     }
     // 新增拍照/上傳功能
     window.onPhotoUpload = function(tableId, dayIdx, routeIdx, mode) {
-      if (mode === 'upload') {
-        const pwd = prompt('請輸入上傳密碼：');
-        if (pwd !== '820123') {
-          alert('密碼錯誤，無法上傳');
-          return;
-        }
-      }
-      const list = getEmployeeList();
-      const emp = list.find(e => e.tableId === tableId);
       const input = document.createElement('input');
       input.type = 'file';
       input.accept = 'image/*';
@@ -2283,7 +2283,10 @@
       }
       input.onchange = function(e) {
         const file = e.target.files[0];
-        if (!file) return;
+        if (!file) {
+          alert('無法啟動相機，請確認瀏覽器支援拍照並已開啟相機權限，或改用「選擇檔案」功能。');
+          return;
+        }
         const reader = new FileReader();
         reader.onload = function(evt) {
           if (navigator.geolocation) {
