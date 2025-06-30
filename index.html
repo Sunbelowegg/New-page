@@ -827,8 +827,8 @@
     <span id="themeIcon">🌙</span> 主題切換
   </button>
   <div class="nav-bar">
-    <a href="index.html" class="nav-link active">📝 填寫個人行程</a>
-    <a href="weekly-schedule-summary.html" class="nav-link">�� 查看總覽</a>
+    <a href="index.html" class="nav-link" id="nav-personal">📝 填寫個人行程</a>
+    <a href="weekly-schedule-summary.html" class="nav-link" id="nav-summary">📊 查看總覽</a>
   </div>
   <div class="container">
     <div class="header-section">
@@ -1307,6 +1307,17 @@
           closeModal('editEmployeeModal');
         }
       });
+      
+      // 動態設定 active
+      const path = location.pathname;
+      document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+      });
+      if (path.endsWith('index.html') || path.endsWith('/')) {
+        document.getElementById('nav-personal').classList.add('active');
+      } else if (path.endsWith('weekly-schedule-summary.html')) {
+        document.getElementById('nav-summary').classList.add('active');
+      }
     });
   </script>
 </body>
