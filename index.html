@@ -1123,11 +1123,18 @@
         
         filteredRoutes.forEach((route, routeIdx) => {
           const tr = document.createElement('tr');
+          // 判斷按鈕文字
+          const list = getEmployeeList();
+          const selectedUserId = localStorage.getItem('selectedUser');
+          const emp = list.find(e => e.tableId === selectedUserId);
+          const isDai = emp && emp.name === '戴誠志';
+          const photoBtnText = isDai ? '📷 拍照/上傳' : '📷 拍照';
           tr.innerHTML = `
             <td><input type="text" value="${route.customer}" onchange="onRouteChange('${tableId}',${dayIdx},${routeIdx},'customer',this.value)"></td>
             <td><input type="text" value="${route.content}" onchange="onRouteChange('${tableId}',${dayIdx},${routeIdx},'content',this.value)"></td>
             <td>
               <button class="remove-route-btn" onclick="removeRoute('${tableId}',${dayIdx},${routeIdx})">🗑️ 刪除</button>
+              <button class="photo-upload-btn" onclick="onPhotoUpload('${tableId}',${dayIdx},${routeIdx})">${photoBtnText}</button>
             </td>
           `;
           tbody.appendChild(tr);
@@ -1270,6 +1277,52 @@
     
     window.closeModal = function(modalId) {
       document.getElementById(modalId).style.display = 'none';
+    }
+    
+    // 新增拍照/上傳功能
+    window.onPhotoUpload = function(tableId, dayIdx, routeIdx) {
+      // 取得目前選擇的員工姓名
+      const list = getEmployeeList();
+      const selectedUserId = localStorage.getItem('selectedUser');
+      const emp = list.find(e => e.tableId === selectedUserId);
+      const isDai = emp && emp.name === '戴誠志';
+
+      // 建立 input
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      if (!isDai) {
+        input.capture = 'environment'; // 只允許拍照
+      }
+      input.onchange = function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          // 取得GPS
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(pos) {
+              savePhotoAndLocation(tableId, dayIdx, routeIdx, evt.target.result, pos.coords.latitude, pos.coords.longitude);
+            }, function() {
+              savePhotoAndLocation(tableId, dayIdx, routeIdx, evt.target.result, null, null);
+            });
+          } else {
+            savePhotoAndLocation(tableId, dayIdx, routeIdx, evt.target.result, null, null);
+          }
+        };
+        reader.readAsDataURL(file);
+      };
+      input.click();
+    };
+
+    function savePhotoAndLocation(tableId, dayIdx, routeIdx, photoData, lat, lng) {
+      const data = loadTable(tableId);
+      if (!data[dayIdx].routes[routeIdx]) return;
+      data[dayIdx].routes[routeIdx].photo = photoData;
+      data[dayIdx].routes[routeIdx].lat = lat;
+      data[dayIdx].routes[routeIdx].lng = lng;
+      saveTable(tableId, data);
+      renderEmployeeSchedule();
     }
     
     // 初始化
