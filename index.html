@@ -910,6 +910,19 @@
         {label: '下週 ('+formatDate(nextMonday)+')', value: formatDate(nextMonday)}
       ];
     }
+    function getWeekDates(mondayStr) {
+      let monday = new Date(mondayStr);
+      if (isNaN(monday.getTime())) {
+        // 如果無效，改用本週一
+        monday = getMonday(new Date());
+      }
+      const days = ['(週一)','(週二)','(週三)','(週四)','(週五)'];
+      return days.map((d, i) => {
+        const date = new Date(monday);
+        date.setDate(monday.getDate() + i);
+        return `${date.getFullYear()}/${date.getMonth()+1}/${date.getDate()} ${d}`;
+      });
+    }
     function renderWeekSelect() {
       const weekSelect = document.getElementById('weekSelect');
       weekSelect.innerHTML = '';
@@ -921,6 +934,10 @@
       });
       const savedWeek = localStorage.getItem('selectedWeek');
       if (savedWeek) weekSelect.value = savedWeek;
+      if (!weekSelect.value) {
+        weekSelect.value = getWeekOptions()[1].value; // 預設本週
+        localStorage.setItem('selectedWeek', weekSelect.value);
+      }
     }
     // 員工名單管理
     function getEmployeeList() {
@@ -991,15 +1008,6 @@
     function getTableKey(tableId) {
       const week = document.getElementById('weekSelect').value;
       return tableId + '-' + week;
-    }
-    function getWeekDates(mondayStr) {
-      const days = ['(週一)','(週二)','(週三)','(週四)','(週五)'];
-      const monday = new Date(mondayStr);
-      return days.map((d, i) => {
-        const date = new Date(monday);
-        date.setDate(monday.getDate() + i);
-        return `${date.getFullYear()}/${date.getMonth()+1}/${date.getDate()} ${d}`;
-      });
     }
     function getDefaultDayData(dateStr) {
       return {
