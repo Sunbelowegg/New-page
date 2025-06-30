@@ -1,55 +1,240 @@
-
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
-  <title>行程總覽</title>
+  <title>員工行程總覽（Google Sheets）</title>
   <style>
-    body { font-family: sans-serif; padding: 20px; }
-    table { border-collapse: collapse; width: 100%; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-    th { background-color: #f0f0f0; }
+    body {
+      font-family: 'Noto Sans TC', Arial, sans-serif;
+      background: #f7f7fa;
+      margin: 0;
+      padding: 0;
+    }
+    #schedule-cards {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 32px;
+      justify-content: flex-start;
+      padding: 32px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 2px 12px #0001;
+      padding: 24px;
+      min-width: 350px;
+      max-width: 420px;
+      flex: 1 1 350px;
+      display: flex;
+      flex-direction: column;
+    }
+    .card h2 {
+      margin: 0 0 12px 0;
+      font-size: 1.3em;
+      color: #2d3a4a;
+    }
+    .week-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .week-table th, .week-table td {
+      border: 1px solid #e0e0e0;
+      padding: 6px 8px;
+      text-align: left;
+      font-size: 0.98em;
+    }
+    .week-table th {
+      background: #f0f4f8;
+      color: #3a4a5a;
+    }
+    .day-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .day-list li {
+      margin-bottom: 4px;
+      padding: 2px 0;
+      border-bottom: 1px dashed #e0e0e0;
+      font-size: 0.97em;
+    }
+    .day-list li:last-child {
+      border-bottom: none;
+    }
+    @media (max-width: 900px) {
+      #schedule-cards {
+        flex-direction: column;
+        gap: 20px;
+        padding: 10px;
+      }
+      .card {
+        min-width: unset;
+        max-width: unset;
+        width: 100%;
+      }
+    }
   </style>
 </head>
 <body>
   <h2>📋 員工行程總覽（自動讀取 Google Sheets）</h2>
-  <table id="schedule-table">
-    <thead>
-      <tr>
-        <th>姓名</th><th>日期</th><th>客戶</th><th>內容</th><th>出發</th><th>回來</th>
-        <th>出發Km</th><th>回來Km</th><th>加油Km</th><th>公升</th><th>座標</th><th>圖片</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-
+  <div id="company-stats" style="padding:24px 32px 0 32px;font-size:1.2em;"></div>
+  <div id="schedule-cards"></div>
   <script>
-    async function loadSchedule() {
-      const res = await fetch("https://opensheet.elk.sh/1MS1RpJQjONMDpzCwG6yiFNSG_nhEOJVe_3CGCrB7e58/工作表1");
-      const data = await res.json();
-      const tbody = document.querySelector("#schedule-table tbody");
-      tbody.innerHTML = "";
-      data.forEach(row => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${row["姓名"] || ""}</td>
-          <td>${row["日期"] || ""}</td>
-          <td>${row["客戶"] || ""}</td>
-          <td>${row["行程內容"] || ""}</td>
-          <td>${row["出勤時間"] || ""}</td>
-          <td>${row["回公司時間"] || ""}</td>
-          <td>${row["出發Km"] || ""}</td>
-          <td>${row["回來Km"] || ""}</td>
-          <td>${row["加油公里數"] || ""}</td>
-          <td>${row["加油公升"] || ""}</td>
-          <td>${row["經緯度"] || ""}</td>
-          <td>${row["上傳圖片"] || ""}</td>
-        `;
-        tbody.appendChild(tr);
+    // 你的 Google Sheets CSV 連結
+    const csvUrl = 'https://corsproxy.io/?https://docs.google.com/spreadsheets/d/e/2PACX-1vTO8x9b16DUvF4fNI2J0fYUQUbrbYoA5eSzIuKP3bVG0ZXZjEk3Do3cjdBAKANWinQilF1WfReO_ysW/pub?output=csv';
+
+    // 解析 CSV
+    function parseCSV(text) {
+      const lines = text.trim().split('\n');
+      return lines.map(line => {
+        const cells = [];
+        let inQuotes = false, cell = '';
+        for (let i = 0; i < line.length; i++) {
+          const char = line[i];
+          if (char === '"') inQuotes = !inQuotes;
+          else if (char === ',' && !inQuotes) {
+            cells.push(cell);
+            cell = '';
+          } else {
+            cell += char;
+          }
+        }
+        cells.push(cell);
+        return cells;
       });
     }
 
-    window.onload = loadSchedule;
+    // 依員工分組、依日期分天
+    function groupByEmployeeAndDay(rows) {
+      if (!rows || rows.length < 2) return {};
+      const header = rows[0];
+      const nameIdx = header.findIndex(h => h.includes('姓名'));
+      const dateIdx = header.findIndex(h => h.includes('日期'));
+      const clientIdx = header.findIndex(h => h.includes('客戶'));
+      const contentIdx = header.findIndex(h => h.includes('內容'));
+      const startTimeIdx = header.findIndex(h => h.includes('出勤時間'));
+      const endTimeIdx = header.findIndex(h => h.includes('回公司時間'));
+      const startKmIdx = header.findIndex(h => h.includes('出發Km'));
+      const endKmIdx = header.findIndex(h => h.includes('回來Km'));
+      const fuelKmIdx = header.findIndex(h => h.includes('加油公里數'));
+      const fuelLIdx = header.findIndex(h => h.includes('加油公升'));
+      const latlngIdx = header.findIndex(h => h.includes('經緯度'));
+      const imgIdx = header.findIndex(h => h.includes('圖片'));
+      const empMap = {};
+      for (let i = 1; i < rows.length; i++) {
+        const row = rows[i];
+        if (!row || row.length < 2) continue;
+        const name = row[nameIdx] || '未填姓名';
+        const date = row[dateIdx] || '';
+        if (!name || !date) continue;
+        if (!empMap[name]) empMap[name] = {};
+        if (!empMap[name][date]) empMap[name][date] = [];
+        empMap[name][date].push({
+          client: row[clientIdx] || '',
+          content: row[contentIdx] || '',
+          startTime: row[startTimeIdx] || '',
+          endTime: row[endTimeIdx] || '',
+          startKm: row[startKmIdx] || '',
+          endKm: row[endKmIdx] || '',
+          fuelKm: row[fuelKmIdx] || '',
+          fuelL: row[fuelLIdx] || '',
+          latlng: row[latlngIdx] || '',
+          img: row[imgIdx] || ''
+        });
+      }
+      return empMap;
+    }
+
+    // 產生卡片
+    function renderCards(empMap) {
+      const container = document.getElementById('schedule-cards');
+      container.innerHTML = '';
+      if (!empMap || Object.keys(empMap).length === 0) {
+        container.innerHTML = '<p>目前沒有任何行程資料。</p>';
+        return;
+      }
+      Object.keys(empMap).forEach(name => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `<h2>${name}</h2>
+          <table class="week-table">
+            <tr>
+              <th>日期</th>
+              <th>行程</th>
+            </tr>
+            ${Object.keys(empMap[name]).map(date => {
+              return empMap[name][date].map(item => `
+                <tr>
+                  <td>${date}</td>
+                  <td>
+                    <ul class="day-list">
+                      <li>客戶：${item.client}</li>
+                      <li>內容：${item.content}</li>
+                      <li>出勤：${item.startTime}</li>
+                      <li>回公司：${item.endTime}</li>
+                      <li>出發Km：${item.startKm}</li>
+                      <li>回來Km：${item.endKm}</li>
+                      <li>加油Km：${item.fuelKm}，公升：${item.fuelL}</li>
+                      <li>座標：${item.latlng}</li>
+                      <li>圖片：${item.img ? `<a href="${item.img}" target="_blank">查看</a>` : ''}</li>
+                    </ul>
+                  </td>
+                </tr>
+              `).join('');
+            }).join('')}
+          </table>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // 主流程
+    fetch(csvUrl)
+      .then(response => response.text())
+      .then(csvText => {
+        const rows = parseCSV(csvText);
+        const empMap = groupByEmployeeAndDay(rows);
+        renderCompanyStats(rows);
+        renderCards(empMap);
+      })
+      .catch(err => {
+        document.getElementById('schedule-cards').innerHTML = '<p>讀取 Google 表單資料失敗，請檢查連結或網路。</p>';
+        document.getElementById('company-stats').innerHTML = '';
+        console.error('fetch失敗:', err);
+      });
+
+    // 新增：全公司統計區塊
+    function renderCompanyStats(rows) {
+      if (!rows || rows.length < 2) {
+        document.getElementById('company-stats').innerHTML = '';
+        return;
+      }
+      const header = rows[0];
+      const startKmIdx = header.findIndex(h => h.includes('出發Km'));
+      const endKmIdx = header.findIndex(h => h.includes('回來Km'));
+      const fuelLIdx = header.findIndex(h => h.includes('加油公升'));
+      const clientIdx = header.findIndex(h => h.includes('客戶'));
+      let totalKm = 0, totalFuel = 0, totalRoutes = 0;
+      const hospitalSet = new Set();
+      const schoolSet = new Set();
+      for (let i = 1; i < rows.length; i++) {
+        const row = rows[i];
+        if (!row || row.length < 2) continue;
+        const start = Number(row[startKmIdx]) || 0;
+        const end = Number(row[endKmIdx]) || 0;
+        if (end > start) totalKm += (end - start);
+        totalFuel += Number(row[fuelLIdx]) || 0;
+        totalRoutes++;
+        const client = (row[clientIdx] || '').trim();
+        if (client.includes('醫院')) hospitalSet.add(client);
+        if (client.includes('學校')) schoolSet.add(client);
+      }
+      document.getElementById('company-stats').innerHTML =
+        `<b>全公司本週統計：</b> 總公里數：<b>${totalKm}</b> km　|　總加油公升：<b>${totalFuel}</b> L　|　總行程數：<b>${totalRoutes}</b><br>
+        拜訪醫院數：<b>${hospitalSet.size}</b>　|　拜訪學校數：<b>${schoolSet.size}</b><br>
+        <span style="color:#357abd">醫院：</span> ${[...hospitalSet].join('、') || '無'}<br>
+        <span style="color:#357abd">學校：</span> ${[...schoolSet].join('、') || '無'}`;
+    }
   </script>
 </body>
 </html>
