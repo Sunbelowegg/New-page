@@ -1866,12 +1866,21 @@
 
 <script>
 async function submitToSheet(data) {
-  await fetch("https://script.google.com/macros/s/AKfycbw7ckG4oNodB0Lau4S29Lqo9GnggDGA0m03-vTwDfiYnXjMDnzB5TR6yPezjf_8GVlNuA/exec", {
+  await fetch("https://script.google.com/macros/s/AKfycbzlFsqndMmxlZofh_LGFfn-r-7UVpzVca4HYL9AM1nEmiIuIwzbK-Plr_uW85W7DKjF/exec", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(data)
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      "員工姓名": "測試員工",
+      "日期": "2024-07-01",
+      "客戶": "測試醫院",
+      "行程內容": "測試內容",
+      "出勤時間": "08:30",
+      "回公司時間": "18:00",
+      "出發Km": "100",
+      "回來Km": "120",
+      "加油公里數": "110",
+      "加油公升": "10"
+    })
   });
   alert("已送出行程資料！");
 }
