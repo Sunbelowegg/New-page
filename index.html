@@ -1861,28 +1861,62 @@
       // 主題初始化
       if(localStorage.getItem('theme')==='dark') document.body.classList.add('dark');
       updateThemeIcon();
+      
+      const submitBtn = document.getElementById('submitWeekBtn');
+      if(submitBtn) {
+        submitBtn.onclick = async function() {
+          const tableId = localStorage.getItem('selectedUser') || getEmployeeList()[0].tableId;
+          const list = getEmployeeList();
+          const emp = list.find(e => e.tableId === tableId);
+          const empName = emp ? emp.name : '';
+          const week = document.getElementById('weekSelect').value;
+          const weekData = loadTable(tableId);
+          let success = 0, fail = 0;
+          for(const day of weekData) {
+            // 每天可能有多筆行程
+            for(const route of day.routes) {
+              // 若客戶與內容皆為空則略過
+              if(!(route.customer || route.content)) continue;
+              const data = {
+                "員工姓名": empName,
+                "日期": day.date.split(' ')[0],
+                "客戶": route.customer || '',
+                "行程內容": route.content || '',
+                "出勤時間": day.start || '',
+                "回公司時間": day.end || '',
+                "出發Km": day.carStartKm || '',
+                "回來Km": day.carEndKm || '',
+                "加油公里數": day.refuel ? (day.refuelKm || '') : '',
+                "加油公升": day.refuel ? (day.refuelLiters || '') : ''
+              };
+              try {
+                await submitToSheet(data);
+                success++;
+              } catch(e) {
+                fail++;
+              }
+            }
+          }
+          if(success>0 && fail===0) {
+            alert('本週所有行程已成功送出！');
+          } else if(success>0) {
+            alert(`部分送出成功，共 ${success} 筆成功、${fail} 筆失敗。`);
+          } else {
+            alert('送出失敗，請檢查網路或稍後再試。');
+          }
+        }
+      }
     });
   </script>
 
 <script>
 async function submitToSheet(data) {
-  await fetch("https://script.google.com/macros/s/AKfycbzlFsqndMmxlZofh_LGFfn-r-7UVpzVca4HYL9AM1nEmiIuIwzbK-Plr_uW85W7DKjF/exec", {
+  const res = await fetch("https://script.google.com/macros/s/AKfycbzlFsqndMmxlZofh_LGFfn-r-7UVpzVca4HYL9AM1nEmiIuIwzbK-Plr_uW85W7DKjF/exec", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      "員工姓名": "測試員工",
-      "日期": "2024-07-01",
-      "客戶": "測試醫院",
-      "行程內容": "測試內容",
-      "出勤時間": "08:30",
-      "回公司時間": "18:00",
-      "出發Km": "100",
-      "回來Km": "120",
-      "加油公里數": "110",
-      "加油公升": "10"
-    })
+    body: JSON.stringify(data)
   });
-  alert("已送出行程資料！");
+  if(!res.ok) throw new Error('送出失敗');
 }
 </script>
 
@@ -1935,6 +1969,10 @@ async function submitToSheet(data) {
           <button class="btn btn-secondary" onclick="resetAllTables()">
             <span>🔄</span>
             重設本週內容
+          </button>
+          <button class="btn btn-primary" id="submitWeekBtn">
+            <span>📤</span>
+            送出本週行程
           </button>
         </div>
       </div>
