@@ -870,8 +870,9 @@
       ];
     }
     function getWeekDates(mondayStr) {
-      let monday = new Date(mondayStr);
-      if (isNaN(monday.getTime())) {
+      // 嚴格只接受 YYYY-MM-DD 格式
+      let monday = /^\d{4}-\d{2}-\d{2}$/.test(mondayStr) ? new Date(mondayStr) : null;
+      if (!monday || isNaN(monday.getTime())) {
         // 如果無效，改用本週一
         monday = getMonday(new Date());
       }
@@ -891,12 +892,13 @@
         option.textContent = opt.label;
         weekSelect.appendChild(option);
       });
-      const savedWeek = localStorage.getItem('selectedWeek');
-      if (savedWeek) weekSelect.value = savedWeek;
-      if (!weekSelect.value) {
-        weekSelect.value = getWeekOptions()[1].value; // 預設本週
-        localStorage.setItem('selectedWeek', weekSelect.value);
+      let savedWeek = localStorage.getItem('selectedWeek');
+      // 嚴格檢查格式
+      if (!savedWeek || !/^\d{4}-\d{2}-\d{2}$/.test(savedWeek)) {
+        savedWeek = getWeekOptions()[1].value; // 預設本週
+        localStorage.setItem('selectedWeek', savedWeek);
       }
+      weekSelect.value = savedWeek;
     }
     function getEmployeeList() {
       return JSON.parse(localStorage.getItem('employeeList') || 'null') || [
@@ -1155,8 +1157,8 @@
   </button>
   
   <div class="nav-bar">
-    <a href="employee-schedule.html" class="nav-link">📝 填寫個人行程</a>
-    <a href="weekly-schedule-summary.html" class="nav-link active">📊 查看總覽</a>
+    <a href="index.html" class="nav-link">📝 填寫個人行程</a>
+    <a href="weekly-schedule-summary.html" class="nav-link active">每週行程總覽</a>
   </div>
   
   <div class="container">
