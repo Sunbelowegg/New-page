@@ -1444,22 +1444,18 @@
             day.routes.forEach((route, routeIdx) => {
               if (route.customer || route.content) {
                 html += `<div class="pro-summary-route">`;
-                // 客戶與定位按鈕同一行
+                // 客戶名稱
                 html += `<div style='display:flex;align-items:center;gap:8px;flex-wrap:wrap;'>`;
                 html += `<b>客戶：</b>${route.customer || ''}`;
-                html += `<button class='location-btn' style='margin-left:6px;' onclick="onLocation('${emp.tableId}',${dayIdx},${routeIdx})">📍 定位</button>`;
                 html += `</div>`;
                 // 內容獨立一行
                 if (route.content) html += `<div style='margin-top:4px;'><b>內容：</b>${route.content}</div>`;
-                // 照片與地圖
+                // 照片與地圖（只保留照片/刪除地圖連結）
                 if (route.photo) {
                   html += `<div style='margin:6px 0;display:flex;align-items:center;gap:8px;'>`;
                   html += `<img src='${route.photo}' alt='照片' style='max-width:80px;max-height:60px;cursor:pointer;border-radius:6px;border:1px solid #ccc;' onclick="showRoutePhotoModal('${encodeURIComponent(route.photo)}')">`;
                   html += `<button type='button' style='background:#dc3545;color:#fff;border:none;border-radius:4px;padding:4px 10px;cursor:pointer;font-size:0.9em;' onclick="deleteRoutePhoto('${emp.tableId}',${dayIdx},${routeIdx})">刪除</button>`;
                   html += `</div>`;
-                }
-                if (route.lat && route.lng) {
-                  html += `<a href='https://maps.google.com/?q=${route.lat},${route.lng}' target='_blank' style='color:#357abd;text-decoration:underline;font-size:0.95em;margin-left:10px;'>查看地圖</a>`;
                 }
                 html += `</div>`;
               }
@@ -2367,23 +2363,6 @@
       }
       updateThemeIcon();
     }
-    // 新增 window.onLocation 函數
-    window.onLocation = function(tableId, dayIdx, routeIdx) {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(pos) {
-          const data = loadTable(tableId);
-          if (!data[dayIdx].routes[routeIdx]) return;
-          data[dayIdx].routes[routeIdx].lat = pos.coords.latitude;
-          data[dayIdx].routes[routeIdx].lng = pos.coords.longitude;
-          saveTable(tableId, data);
-          renderSummaryBlock();
-        }, function() {
-          alert('定位失敗，請確認已開啟定位權限');
-        });
-      } else {
-        alert('此瀏覽器不支援定位功能');
-      }
-    };
   </script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>

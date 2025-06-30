@@ -802,96 +802,543 @@
         padding: 4px 8px;
       }
     }
+
+    /* 載入動畫和骨架屏 */
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      transition: opacity 0.3s ease;
+    }
+
+    body.dark .loading-overlay {
+      background: rgba(45, 50, 58, 0.95);
+    }
+
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #357abd;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    body.dark .loading-spinner {
+      border-color: #444;
+      border-top-color: #ffe082;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .skeleton {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s infinite;
+      border-radius: 4px;
+    }
+
+    body.dark .skeleton {
+      background: linear-gradient(90deg, #444 25%, #555 50%, #444 75%);
+      background-size: 200% 100%;
+    }
+
+    @keyframes loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .skeleton-day {
+      height: 200px;
+      margin-bottom: 20px;
+    }
+
+    .skeleton-title {
+      height: 40px;
+      margin-bottom: 15px;
+    }
+
+    .skeleton-row {
+      height: 60px;
+      margin-bottom: 10px;
+    }
+
+    /* 快捷鍵提示 */
+    .shortcut-hint {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 10px 15px;
+      border-radius: 8px;
+      font-size: 0.9em;
+      z-index: 1000;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s ease;
+    }
+
+    .shortcut-hint.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .shortcut-key {
+      background: #333;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin: 0 2px;
+      font-family: monospace;
+    }
+
+    /* 拖拽排序 */
+    .draggable-row {
+      cursor: grab;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .draggable-row:hover {
+      background: rgba(53, 122, 189, 0.05);
+      transform: translateX(5px);
+    }
+
+    .draggable-row.dragging {
+      cursor: grabbing;
+      opacity: 0.8;
+      transform: rotate(2deg) scale(1.02);
+      z-index: 1000;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .drag-handle {
+      cursor: grab;
+      padding: 5px;
+      margin-right: 10px;
+      color: #666;
+      transition: color 0.2s ease;
+    }
+
+    .drag-handle:hover {
+      color: #357abd;
+    }
+
+    .drag-handle:active {
+      cursor: grabbing;
+    }
+
+    .drop-zone {
+      border: 2px dashed #357abd;
+      background: rgba(53, 122, 189, 0.05);
+      border-radius: 8px;
+      margin: 10px 0;
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #357abd;
+      font-weight: 500;
+    }
+
+    /* 自動儲存提示 */
+    .auto-save-indicator {
+      position: fixed;
+      top: 80px;
+      right: 30px;
+      background: rgba(40, 167, 69, 0.9);
+      color: white;
+      padding: 8px 15px;
+      border-radius: 20px;
+      font-size: 0.9em;
+      z-index: 1000;
+      opacity: 0;
+      transform: translateX(100px);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .auto-save-indicator.show {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .auto-save-indicator.saving {
+      background: rgba(255, 193, 7, 0.9);
+    }
+
+    /* 圖表容器 */
+    .chart-container {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(15px);
+      border-radius: 20px;
+      padding: 30px;
+      margin: 20px 0;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    body.dark .chart-container {
+      background: rgba(45, 50, 58, 0.95);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .chart-title {
+      font-size: 1.3em;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: #2d3e50;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    body.dark .chart-title {
+      color: #eee;
+    }
+
+    .chart-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    /* 趨勢分析卡片 */
+    .trend-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .trend-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .trend-value {
+      font-size: 2em;
+      font-weight: 800;
+      margin: 10px 0;
+    }
+
+    .trend-label {
+      font-size: 0.9em;
+      opacity: 0.9;
+    }
+
+    .trend-change {
+      font-size: 0.8em;
+      margin-top: 5px;
+    }
+
+    .trend-up {
+      color: #28a745;
+    }
+
+    .trend-down {
+      color: #dc3545;
+    }
   </style>
   <script>
-    // 主題切換
-    function toggleTheme() {
-      document.body.classList.toggle('dark');
-      localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : '');
-      document.querySelectorAll('.theme-toggle').forEach(btn => btn.classList.toggle('dark', document.body.classList.contains('dark')));
-      updateThemeIcon();
+    // 全域變數
+    let autoSaveTimer = null;
+    let isDragging = false;
+    let draggedElement = null;
+    let dragStartY = 0;
+    let currentDropZone = null;
+
+    // 載入動畫控制
+    function showLoading() {
+      document.getElementById('loadingOverlay').style.display = 'flex';
     }
-    function updateThemeIcon() {
-      var icon = document.getElementById('themeIcon');
-      if (!icon) return;
-      icon.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
+
+    function hideLoading() {
+      document.getElementById('loadingOverlay').style.display = 'none';
     }
-    document.addEventListener('DOMContentLoaded', function() {
-      if(localStorage.getItem('theme')==='dark') document.body.classList.add('dark');
-      updateThemeIcon();
-    });
-  </script>
-</head>
-<body>
-  <button class="theme-toggle" onclick="toggleTheme()">
-    <span id="themeIcon">🌙</span> 主題切換
-  </button>
-  <div class="nav-bar">
-    <a href="index.html" class="nav-link" id="nav-personal">📝 填寫個人行程</a>
-    <a href="weekly-schedule-summary.html" class="nav-link" id="nav-summary">📊 查看總覽</a>
-  </div>
-  <div class="container">
-    <div class="header-section">
-      <div class="title">
-        <span class="icon">📝</span>
-        員工個人行程表
-      </div>
+
+    // 自動儲存功能
+    function showAutoSaveIndicator(message = '已自動儲存', isSaving = false) {
+      const indicator = document.getElementById('autoSaveIndicator');
+      const text = document.getElementById('autoSaveText');
       
-      <div class="controls-section">
-        <div class="select-group" id="userSelectRow">
-          <!-- 員工選擇將在這裡動態生成 -->
-        </div>
+      text.textContent = message;
+      indicator.classList.remove('saving');
+      
+      if (isSaving) {
+        indicator.classList.add('saving');
+        text.textContent = '儲存中...';
+      }
+      
+      indicator.classList.add('show');
+      
+      setTimeout(() => {
+        indicator.classList.remove('show');
+      }, 2000);
+    }
+
+    function debounceAutoSave(func, delay = 1000) {
+      if (autoSaveTimer) {
+        clearTimeout(autoSaveTimer);
+      }
+      
+      showAutoSaveIndicator('儲存中...', true);
+      
+      autoSaveTimer = setTimeout(() => {
+        func();
+        showAutoSaveIndicator();
+      }, delay);
+    }
+
+    // 快捷鍵支援
+    function setupKeyboardShortcuts() {
+      document.addEventListener('keydown', function(e) {
+        // Ctrl+S: 儲存
+        if (e.ctrlKey && e.key === 's') {
+          e.preventDefault();
+          const selectedUser = localStorage.getItem('selectedUser');
+          if (selectedUser && selectedUser !== '__new__') {
+            const data = loadTable(selectedUser);
+            saveTable(selectedUser, data);
+            showAutoSaveIndicator('已手動儲存');
+          }
+        }
         
-        <div class="select-group">
-          <span class="select-label">選擇週次：</span>
-          <select class="select-input" id="weekSelect"></select>
-        </div>
+        // Ctrl+N: 新增員工
+        if (e.ctrlKey && e.key === 'n') {
+          e.preventDefault();
+          document.getElementById('userSelect').value = '__new__';
+          document.getElementById('userSelect').dispatchEvent(new Event('change'));
+          document.getElementById('newUserInput').focus();
+        }
         
-        <div class="action-buttons">
-          <button class="btn btn-secondary" onclick="resetAllTables()">
-            <span>🔄</span>
-            重設本週內容
-          </button>
+        // ?: 顯示快捷鍵提示
+        if (e.key === '?') {
+          e.preventDefault();
+          showShortcutHint();
+        }
+        
+        // Escape: 關閉模態框
+        if (e.key === 'Escape') {
+          const modals = document.querySelectorAll('.modal-overlay');
+          modals.forEach(modal => {
+            if (modal.style.display === 'flex') {
+              modal.style.display = 'none';
+            }
+          });
+        }
+      });
+    }
+
+    function showShortcutHint() {
+      const hint = document.getElementById('shortcutHint');
+      hint.classList.add('show');
+      
+      setTimeout(() => {
+        hint.classList.remove('show');
+      }, 3000);
+    }
+
+    // 拖拽排序功能
+    function setupDragAndDrop() {
+      document.addEventListener('mousedown', function(e) {
+        const dragHandle = e.target.closest('.drag-handle');
+        if (!dragHandle) return;
+        
+        e.preventDefault();
+        const row = dragHandle.closest('.draggable-row');
+        if (!row) return;
+        
+        isDragging = true;
+        draggedElement = row;
+        dragStartY = e.clientY;
+        
+        row.classList.add('dragging');
+        
+        // 創建拖拽時的視覺效果
+        const rect = row.getBoundingClientRect();
+        row.style.width = rect.width + 'px';
+        row.style.position = 'fixed';
+        row.style.top = rect.top + 'px';
+        row.style.left = rect.left + 'px';
+        row.style.zIndex = '1000';
+      });
+
+      document.addEventListener('mousemove', function(e) {
+        if (!isDragging || !draggedElement) return;
+        
+        const deltaY = e.clientY - dragStartY;
+        draggedElement.style.transform = `translateY(${deltaY}px) rotate(2deg) scale(1.02)`;
+        
+        // 尋找可能的放置區域
+        const dropZones = document.querySelectorAll('.drop-zone');
+        dropZones.forEach(zone => {
+          const rect = zone.getBoundingClientRect();
+          if (e.clientY >= rect.top && e.clientY <= rect.bottom) {
+            zone.style.background = 'rgba(53, 122, 189, 0.2)';
+            currentDropZone = zone;
+          } else {
+            zone.style.background = 'rgba(53, 122, 189, 0.05)';
+          }
+        });
+      });
+
+      document.addEventListener('mouseup', function(e) {
+        if (!isDragging || !draggedElement) return;
+        
+        isDragging = false;
+        draggedElement.classList.remove('dragging');
+        draggedElement.style.position = '';
+        draggedElement.style.top = '';
+        draggedElement.style.left = '';
+        draggedElement.style.width = '';
+        draggedElement.style.transform = '';
+        draggedElement.style.zIndex = '';
+        
+        // 處理放置邏輯
+        if (currentDropZone) {
+          const tableId = currentDropZone.dataset.tableId;
+          const dayIdx = parseInt(currentDropZone.dataset.dayIdx);
+          const routeIdx = parseInt(currentDropZone.dataset.routeIdx);
+          
+          // 這裡可以實作實際的排序邏輯
+          console.log('拖拽到:', tableId, dayIdx, routeIdx);
+          
+          currentDropZone.style.background = 'rgba(53, 122, 189, 0.05)';
+          currentDropZone = null;
+        }
+        
+        draggedElement = null;
+      });
+    }
+
+    // 圖表分析功能
+    function analyzeWeeklyData() {
+      const selectedUser = localStorage.getItem('selectedUser');
+      if (!selectedUser || selectedUser === '__new__') return;
+      
+      const data = loadTable(selectedUser);
+      if (!data || data.length === 0) return;
+      
+      let totalRoutes = 0;
+      let totalDistance = 0;
+      let totalVisits = 0;
+      let totalMaintenance = 0;
+      
+      data.forEach(day => {
+        if (day.routes) {
+          day.routes.forEach(route => {
+            if (route.customer || route.content) {
+              totalRoutes++;
+              
+              // 計算公里數
+              if (route.distance) {
+                const distance = parseFloat(route.distance) || 0;
+                totalDistance += distance;
+              }
+              
+              // 分類統計
+              const content = (route.content || '').toLowerCase();
+              if (content.includes('拜訪') || content.includes('客戶')) {
+                totalVisits++;
+              } else if (content.includes('維修') || content.includes('保養')) {
+                totalMaintenance++;
+              }
+            }
+          });
+        }
+      });
+      
+      // 更新統計數據
+      document.getElementById('totalRoutes').textContent = totalRoutes;
+      document.getElementById('totalDistance').textContent = totalDistance.toFixed(1);
+      document.getElementById('totalVisits').textContent = totalVisits;
+      document.getElementById('totalMaintenance').textContent = totalMaintenance;
+      
+      // 顯示圖表容器
+      document.getElementById('chartContainer').style.display = 'block';
+      
+      // 繪製簡單圖表
+      drawWeeklyChart(data);
+    }
+
+    function drawWeeklyChart(data) {
+      const canvas = document.getElementById('weeklyChart');
+      const ctx = canvas.getContext('2d');
+      
+      // 清空畫布
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      if (!data || data.length === 0) return;
+      
+      const days = ['週一', '週二', '週三', '週四', '週五'];
+      const routeCounts = data.map(day => {
+        if (!day.routes) return 0;
+        return day.routes.filter(route => route.customer || route.content).length;
+      });
+      
+      const maxCount = Math.max(...routeCounts, 1);
+      const barWidth = canvas.width / days.length - 10;
+      const barHeight = canvas.height - 40;
+      
+      // 繪製柱狀圖
+      days.forEach((day, index) => {
+        const x = index * (canvas.width / days.length) + 5;
+        const height = (routeCounts[index] / maxCount) * barHeight;
+        const y = canvas.height - height - 20;
+        
+        // 繪製柱子
+        ctx.fillStyle = '#357abd';
+        ctx.fillRect(x, y, barWidth, height);
+        
+        // 繪製標籤
+        ctx.fillStyle = '#2d3e50';
+        ctx.font = '12px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(day, x + barWidth / 2, canvas.height - 5);
+        ctx.fillText(routeCounts[index], x + barWidth / 2, y - 5);
+      });
+    }
+
+    // 骨架屏功能
+    function showSkeletonLoading() {
+      const container = document.getElementById('employeeSchedule');
+      container.innerHTML = `
+        <div class="skeleton skeleton-day">
+          <div class="skeleton skeleton-title"></div>
+          <div class="skeleton skeleton-row"></div>
+          <div class="skeleton skeleton-row"></div>
+          <div class="skeleton skeleton-row"></div>
         </div>
-      </div>
-    </div>
-    
-    <div id="employeeSchedule"></div>
-  </div>
-  
-  <!-- 編輯員工模態框 -->
-  <div id="editEmployeeModal" class="modal-overlay">
-    <div class="modal-content">
-      <button class="modal-close" onclick="closeModal('editEmployeeModal')">✖</button>
-      <div class="modal-title">
-        <span>✏️</span>
-        編輯員工姓名
-      </div>
-      <input type="text" id="editEmployeeInput" class="modal-input" placeholder="請輸入新的員工姓名">
-      <div class="modal-actions">
-        <button class="modal-btn modal-btn-cancel" onclick="closeModal('editEmployeeModal')">取消</button>
-        <button class="modal-btn modal-btn-confirm" onclick="confirmEditEmployee()">確認修改</button>
-      </div>
-    </div>
-  </div>
-  
-  <!-- 刪除員工模態框 -->
-  <div id="deleteEmployeeModal" class="modal-overlay">
-    <div class="modal-content">
-      <button class="modal-close" onclick="closeModal('deleteEmployeeModal')">✖</button>
-      <div class="modal-title">
-        <span>🗑️</span>
-        刪除員工
-      </div>
-      <div id="deleteEmployeeMessage" style="margin-bottom: 20px; color: #dc3545; font-weight: 600; line-height: 1.5;"></div>
-      <div class="modal-actions">
-        <button class="modal-btn modal-btn-cancel" onclick="closeModal('deleteEmployeeModal')">取消</button>
-        <button class="modal-btn modal-btn-danger" onclick="confirmDeleteEmployee()">確認刪除</button>
-      </div>
-    </div>
-  </div>
-  
-  <script>
+        <div class="skeleton skeleton-day">
+          <div class="skeleton skeleton-title"></div>
+          <div class="skeleton skeleton-row"></div>
+          <div class="skeleton skeleton-row"></div>
+        </div>
+        <div class="skeleton skeleton-day">
+          <div class="skeleton skeleton-title"></div>
+          <div class="skeleton skeleton-row"></div>
+          <div class="skeleton skeleton-row"></div>
+        </div>
+      `;
+    }
+
     // 週次選單產生
     function getMonday(d) {
       d = new Date(d);
@@ -1029,6 +1476,10 @@
     }
     function saveTable(tableId, data) {
       localStorage.setItem(getTableKey(tableId), JSON.stringify(data));
+      // 觸發自動儲存指示器
+      debounceAutoSave(() => {
+        console.log('資料已自動儲存');
+      });
     }
     function loadTable(tableId) {
       const week = document.getElementById('weekSelect').value;
@@ -1123,6 +1574,11 @@
         
         filteredRoutes.forEach((route, routeIdx) => {
           const tr = document.createElement('tr');
+          tr.className = 'draggable-row';
+          tr.dataset.tableId = tableId;
+          tr.dataset.dayIdx = dayIdx;
+          tr.dataset.routeIdx = routeIdx;
+          
           // 判斷按鈕文字
           const list = getEmployeeList();
           const selectedUserId = localStorage.getItem('selectedUser');
@@ -1130,7 +1586,10 @@
           const isDai = emp && emp.name === '戴誠志';
           const photoBtnText = isDai ? '📷 拍照/上傳' : '📷 拍照';
           tr.innerHTML = `
-            <td><input type="text" value="${route.customer}" onchange="onRouteChange('${tableId}',${dayIdx},${routeIdx},'customer',this.value)"></td>
+            <td>
+              <span class="drag-handle">⋮⋮</span>
+              <input type="text" value="${route.customer}" onchange="onRouteChange('${tableId}',${dayIdx},${routeIdx},'customer',this.value)">
+            </td>
             <td><input type="text" value="${route.content}" onchange="onRouteChange('${tableId}',${dayIdx},${routeIdx},'content',this.value)"></td>
             <td>
               <button class="remove-route-btn" onclick="removeRoute('${tableId}',${dayIdx},${routeIdx})">🗑️ 刪除</button>
@@ -1144,6 +1603,9 @@
         dayBlock.appendChild(routesTable);
         container.appendChild(dayBlock);
       });
+      
+      // 渲染完成後分析資料並顯示圖表
+      analyzeWeeklyData();
     }
     // 行程操作
     window.onDayFieldChange = function(tableId, dayIdx, field, value) {
@@ -1327,12 +1789,36 @@
     
     // 初始化
     document.addEventListener('DOMContentLoaded', function() {
+      // 顯示載入動畫
+      showLoading();
+      
+      // 設定快捷鍵
+      setupKeyboardShortcuts();
+      
+      // 設定拖拽功能
+      setupDragAndDrop();
+      
+      // 初始化基本功能
       renderUserSelect();
       renderWeekSelect();
-      renderEmployeeSchedule();
+      
+      // 延遲渲染以避免載入動畫閃爍
+      setTimeout(() => {
+        renderEmployeeSchedule();
+        hideLoading();
+        
+        // 分析資料並顯示圖表
+        analyzeWeeklyData();
+      }, 500);
+      
+      // 週次選擇事件
       document.getElementById('weekSelect').addEventListener('change', function() {
         localStorage.setItem('selectedWeek', this.value);
-        renderEmployeeSchedule();
+        showSkeletonLoading();
+        setTimeout(() => {
+          renderEmployeeSchedule();
+          analyzeWeeklyData();
+        }, 300);
       });
       
       // 模態框事件監聽器
@@ -1371,6 +1857,155 @@
       } else if (path.endsWith('weekly-schedule-summary.html')) {
         document.getElementById('nav-summary').classList.add('active');
       }
+      
+      // 主題初始化
+      if(localStorage.getItem('theme')==='dark') document.body.classList.add('dark');
+      updateThemeIcon();
+    });
+  </script>
+</head>
+<body>
+  <!-- 載入動畫 -->
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="loading-spinner"></div>
+  </div>
+
+  <!-- 快捷鍵提示 -->
+  <div id="shortcutHint" class="shortcut-hint">
+    <span>💡 快捷鍵：</span>
+    <span class="shortcut-key">Ctrl+S</span> 儲存，
+    <span class="shortcut-key">Ctrl+N</span> 新增員工，
+    <span class="shortcut-key">?</span> 顯示所有快捷鍵
+  </div>
+
+  <!-- 自動儲存指示器 -->
+  <div id="autoSaveIndicator" class="auto-save-indicator">
+    <span>💾</span>
+    <span id="autoSaveText">已自動儲存</span>
+  </div>
+
+  <button class="theme-toggle" onclick="toggleTheme()">
+    <span id="themeIcon">🌙</span> 主題切換
+  </button>
+  <div class="nav-bar">
+    <a href="index.html" class="nav-link" id="nav-personal">📝 填寫個人行程</a>
+    <a href="weekly-schedule-summary.html" class="nav-link" id="nav-summary">📊 查看總覽</a>
+  </div>
+  <div class="container">
+    <div class="header-section">
+      <div class="title">
+        <span class="icon">📝</span>
+        員工個人行程表
+      </div>
+      
+      <div class="controls-section">
+        <div class="select-group" id="userSelectRow">
+          <!-- 員工選擇將在這裡動態生成 -->
+        </div>
+        
+        <div class="select-group">
+          <span class="select-label">選擇週次：</span>
+          <select class="select-input" id="weekSelect"></select>
+        </div>
+        
+        <div class="action-buttons">
+          <button class="btn btn-secondary" onclick="resetAllTables()">
+            <span>🔄</span>
+            重設本週內容
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <div id="employeeSchedule"></div>
+    
+    <!-- 圖表分析區域 -->
+    <div class="chart-container" id="chartContainer" style="display: none;">
+      <div class="chart-title">
+        <span>📊</span>
+        本週行程分析
+      </div>
+      
+      <div class="chart-grid">
+        <div class="trend-card">
+          <div class="trend-label">總行程數</div>
+          <div class="trend-value" id="totalRoutes">0</div>
+          <div class="trend-change" id="routesChange">較上週 <span class="trend-up">+0</span></div>
+        </div>
+        
+        <div class="trend-card">
+          <div class="trend-label">總公里數</div>
+          <div class="trend-value" id="totalDistance">0</div>
+          <div class="trend-change" id="distanceChange">較上週 <span class="trend-up">+0</span></div>
+        </div>
+        
+        <div class="trend-card">
+          <div class="trend-label">拜訪客戶</div>
+          <div class="trend-value" id="totalVisits">0</div>
+          <div class="trend-change" id="visitsChange">較上週 <span class="trend-up">+0</span></div>
+        </div>
+        
+        <div class="trend-card">
+          <div class="trend-label">維修任務</div>
+          <div class="trend-value" id="totalMaintenance">0</div>
+          <div class="trend-change" id="maintenanceChange">較上週 <span class="trend-up">+0</span></div>
+        </div>
+      </div>
+      
+      <div style="margin-top: 30px;">
+        <canvas id="weeklyChart" width="400" height="200"></canvas>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 編輯員工模態框 -->
+  <div id="editEmployeeModal" class="modal-overlay">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal('editEmployeeModal')">✖</button>
+      <div class="modal-title">
+        <span>✏️</span>
+        編輯員工姓名
+      </div>
+      <input type="text" id="editEmployeeInput" class="modal-input" placeholder="請輸入新的員工姓名">
+      <div class="modal-actions">
+        <button class="modal-btn modal-btn-cancel" onclick="closeModal('editEmployeeModal')">取消</button>
+        <button class="modal-btn modal-btn-confirm" onclick="confirmEditEmployee()">確認修改</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 刪除員工模態框 -->
+  <div id="deleteEmployeeModal" class="modal-overlay">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal('deleteEmployeeModal')">✖</button>
+      <div class="modal-title">
+        <span>🗑️</span>
+        刪除員工
+      </div>
+      <div id="deleteEmployeeMessage" style="margin-bottom: 20px; color: #dc3545; font-weight: 600; line-height: 1.5;"></div>
+      <div class="modal-actions">
+        <button class="modal-btn modal-btn-cancel" onclick="closeModal('deleteEmployeeModal')">取消</button>
+        <button class="modal-btn modal-btn-danger" onclick="confirmDeleteEmployee()">確認刪除</button>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // 主題切換
+    function toggleTheme() {
+      document.body.classList.toggle('dark');
+      localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : '');
+      document.querySelectorAll('.theme-toggle').forEach(btn => btn.classList.toggle('dark', document.body.classList.contains('dark')));
+      updateThemeIcon();
+    }
+    function updateThemeIcon() {
+      var icon = document.getElementById('themeIcon');
+      if (!icon) return;
+      icon.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+      if(localStorage.getItem('theme')==='dark') document.body.classList.add('dark');
+      updateThemeIcon();
     });
   </script>
 </body>
