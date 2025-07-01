@@ -479,6 +479,82 @@
       accent-color: #e67e22;
     }
     
+    /* 本週統計樣式 */
+    .weekly-stats {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(15px);
+      border-radius: 16px;
+      padding: 25px;
+      margin-top: 30px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+    }
+    
+    body.dark .weekly-stats {
+      background: rgba(45, 50, 58, 0.95);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .stats-title {
+      font-size: 1.3em;
+      font-weight: 700;
+      color: #357abd;
+      margin-bottom: 20px;
+      text-align: center;
+      letter-spacing: 1px;
+    }
+    
+    body.dark .stats-title {
+      color: #ffe082;
+    }
+    
+    .stats-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+    }
+    
+    .stat-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background: linear-gradient(135deg, rgba(53, 122, 189, 0.1), rgba(53, 122, 189, 0.05));
+      border-radius: 12px;
+      border-left: 4px solid #357abd;
+      transition: all 0.3s ease;
+    }
+    
+    .stat-item:hover {
+      transform: translateX(5px);
+      box-shadow: 0 4px 16px rgba(53, 122, 189, 0.2);
+    }
+    
+    body.dark .stat-item {
+      background: linear-gradient(135deg, rgba(255, 224, 130, 0.1), rgba(255, 224, 130, 0.05));
+      border-left-color: #ffe082;
+    }
+    
+    .stat-label {
+      font-weight: 600;
+      color: #2d3e50;
+    }
+    
+    body.dark .stat-label {
+      color: #eee;
+    }
+    
+    .stat-value {
+      font-weight: 700;
+      color: #357abd;
+      font-size: 1.1em;
+    }
+    
+    body.dark .stat-value {
+      color: #ffe082;
+    }
+    
     .routes-table {
       width: 100%;
       border-collapse: separate;
@@ -838,6 +914,35 @@
         font-size: 0.8em;
         padding: 4px 8px;
       }
+      
+      /* 手機版統計區塊優化 */
+      .weekly-stats {
+        padding: 20px 15px;
+        margin-top: 20px;
+      }
+      
+      .stats-title {
+        font-size: 1.1em;
+        margin-bottom: 15px;
+      }
+      
+      .stats-content {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+      
+      .stat-item {
+        padding: 10px 12px;
+        font-size: 0.9em;
+      }
+      
+      .stat-label {
+        font-size: 0.85em;
+      }
+      
+      .stat-value {
+        font-size: 1em;
+      }
     }
   </style>
   <script>
@@ -888,6 +993,10 @@
             <button class="btn btn-secondary" onclick="resetAllTables()">
               <span>🔄</span>
               重設本週內容
+            </button>
+            <button class="btn btn-primary" onclick="showMileageSummary()">
+              <span>📊</span>
+              公里數彙整
             </button>
           </div>
         </div>
@@ -960,8 +1069,9 @@
       ];
     }
     function getWeekDates(mondayStr) {
-      let monday = new Date(mondayStr);
-      if (isNaN(monday.getTime())) {
+      // 嚴格只接受 YYYY-MM-DD 格式
+      let monday = /^\d{4}-\d{2}-\d{2}$/.test(mondayStr) ? new Date(mondayStr) : null;
+      if (!monday || isNaN(monday.getTime())) {
         // 如果無效，改用本週一
         monday = getMonday(new Date());
       }
@@ -981,17 +1091,20 @@
         option.textContent = opt.label;
         weekSelect.appendChild(option);
       });
-      const savedWeek = localStorage.getItem('selectedWeek');
-      if (savedWeek) weekSelect.value = savedWeek;
-      if (!weekSelect.value) {
-        weekSelect.value = getWeekOptions()[1].value; // 預設本週
-        localStorage.setItem('selectedWeek', weekSelect.value);
+      let savedWeek = localStorage.getItem('selectedWeek');
+      // 嚴格檢查格式
+      if (!savedWeek || !/^\d{4}-\d{2}-\d{2}$/.test(savedWeek)) {
+        savedWeek = getWeekOptions()[1].value; // 預設本週
+        localStorage.setItem('selectedWeek', savedWeek);
       }
+      weekSelect.value = savedWeek;
     }
     // 員工名單管理
     function getEmployeeList() {
       return JSON.parse(localStorage.getItem('employeeList') || 'null') || [
-        {name: '戴誠志', tableId: 'table-dai'}
+        {name: '顏嘉宏', tableId: 'table-yan'},
+        {name: '戴誠志', tableId: 'table-dai'},
+        {name: '陳立', tableId: 'table-ou'}
       ];
     }
     function saveEmployeeList(list) {
@@ -1059,14 +1172,15 @@
     function getDefaultDayData(dateStr) {
       return {
         date: dateStr,
-        start: '08:30',
-        end: '18:00',
+        start: '',
+        end: '',
         car: '',
         carStartKm: '',
         carEndKm: '',
         refuel: false,
         refuelKm: '',
         refuelLiters: '',
+        refuelAmount: '',
         routes: [ {customer: '', content: ''} ]
       };
     }
@@ -1160,6 +1274,7 @@
           row2HTML += `
             <label>⛽ 加油時公里數</label><input type='number' value='${day.refuelKm || ''}' onchange="onDayFieldChange('${tableId}',${dayIdx},'refuelKm',this.value)">
             <label>⛽ 加油公升數</label><input type='number' value='${day.refuelLiters || ''}' onchange="onDayFieldChange('${tableId}',${dayIdx},'refuelLiters',this.value)">
+            <label>⛽ 加油金額</label><input type='number' value='${day.refuelAmount || ''}' onchange="onDayFieldChange('${tableId}',${dayIdx},'refuelAmount',this.value)">
           `;
         }
         
@@ -1197,6 +1312,85 @@
         dayBlock.appendChild(routesTable);
         container.appendChild(dayBlock);
       });
+      
+      // 添加本週統計區域
+      renderWeeklyStats(tableId, weekData);
+    }
+    
+    // 渲染本週統計
+    function renderWeeklyStats(tableId, weekData) {
+      const container = document.getElementById('employeeSchedule');
+      
+      // 計算統計數據
+      let totalKm = 0;
+      let totalRefuelLiters = 0;
+      let totalRefuelAmount = 0;
+      let refuelCount = 0;
+      
+      weekData.forEach(day => {
+        const carStart = day.carStartKm || '';
+        const carEnd = day.carEndKm || '';
+        if (carStart !== '' && carEnd !== '' && !isNaN(carStart) && !isNaN(carEnd)) {
+          const km = Number(carEnd) - Number(carStart);
+          if (!isNaN(km)) totalKm += km;
+        }
+        
+        // 統計加油記錄
+        if (day.refuel) {
+          const liters = parseFloat(day.refuelLiters) || 0;
+          const amount = parseFloat(day.refuelAmount) || 0;
+          if (liters > 0) {
+            totalRefuelLiters += liters;
+            totalRefuelAmount += amount;
+            refuelCount++;
+          }
+        }
+      });
+      
+      // 創建統計區塊
+      const statsBlock = document.createElement('div');
+      statsBlock.className = 'weekly-stats';
+      statsBlock.innerHTML = `
+        <div class="stats-title">📊 本週統計</div>
+        <div class="stats-content">
+          <div class="stat-item">
+            <span class="stat-label">總行駛公里數：</span>
+            <span class="stat-value">${totalKm} km</span>
+          </div>
+          ${refuelCount > 0 ? `
+            <div class="stat-item">
+              <span class="stat-label">加油次數：</span>
+              <span class="stat-value">${refuelCount} 次</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">總加油量：</span>
+              <span class="stat-value">${totalRefuelLiters} L</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">總加油金額：</span>
+              <span class="stat-value">$${totalRefuelAmount}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">平均油耗：</span>
+              <span class="stat-value">${totalRefuelLiters > 0 ? (totalKm / totalRefuelLiters).toFixed(1) : 0} km/L</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">平均每公里成本：</span>
+              <span class="stat-value">$${totalKm > 0 ? (totalRefuelAmount / totalKm).toFixed(2) : 0}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">平均每公升成本：</span>
+              <span class="stat-value">$${totalRefuelLiters > 0 ? (totalRefuelAmount / totalRefuelLiters).toFixed(2) : 0}</span>
+            </div>
+          ` : `
+            <div class="stat-item">
+              <span class="stat-label">本週尚未記錄加油</span>
+            </div>
+          `}
+        </div>
+      `;
+      
+      container.appendChild(statsBlock);
     }
     // 行程操作
     window.onDayFieldChange = function(tableId, dayIdx, field, value) {
@@ -1314,7 +1508,7 @@
         saveEmployeeList(list);
         
         // 關閉模態框
-        document.getElementById('deleteEmployeeModal').style.display = 'none';
+         document.getElementById('deleteEmployeeModal').style.display = 'none';
         
         // 如果還有其他員工，選擇第一個；否則清空選擇
         if (list.length > 0) {
