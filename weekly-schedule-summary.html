@@ -534,6 +534,45 @@
       color: #ffb74d;
     }
     
+    /* 加油按鈕樣式 */
+    .pro-summary-refuel-section {
+      margin-top: 15px;
+    }
+    
+    .refuel-btn {
+      background: linear-gradient(135deg, #e67e22, #f39c12);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 0.95em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 2px 8px rgba(230, 126, 34, 0.3);
+    }
+    
+    .refuel-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(230, 126, 34, 0.4);
+    }
+    
+    .refuel-btn:active {
+      transform: translateY(0);
+    }
+    
+    body.dark .refuel-btn {
+      background: linear-gradient(135deg, #ff9800, #ffb74d);
+      box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
+    }
+    
+    body.dark .refuel-btn:hover {
+      box-shadow: 0 4px 12px rgba(255, 152, 0, 0.4);
+    }
+    
     .empty-day {
       color: #bbb;
       font-size: 1em;
@@ -1192,6 +1231,244 @@
       .heatmap-container {
         grid-template-columns: repeat(3, 1fr);
       }
+      
+      /* 手機版模態框優化 */
+      .modal-content {
+        min-width: 95vw;
+        max-width: 95vw;
+        padding: 20px 15px;
+        margin: 10px;
+        max-height: 85vh;
+      }
+      
+      .modal-title {
+        font-size: 1.2em;
+        margin-bottom: 20px;
+      }
+      
+      .modal-controls {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+      
+      .modal-controls label {
+        margin-right: 0;
+        justify-content: center;
+        padding: 12px;
+        background: rgba(53, 122, 189, 0.1);
+        border-radius: 8px;
+      }
+      
+      .modal-table {
+        font-size: 0.85em;
+      }
+      
+      .modal-table th,
+      .modal-table td {
+        padding: 8px 4px;
+        word-break: break-word;
+      }
+      
+      /* 手機版表格響應式處理 */
+      .modal-table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch; /* iOS平滑滾動 */
+        scrollbar-width: thin; /* Firefox */
+      }
+      
+      .modal-table::-webkit-scrollbar {
+        height: 6px;
+      }
+      
+      .modal-table::-webkit-scrollbar-track {
+        background: rgba(0,0,0,0.1);
+        border-radius: 3px;
+      }
+      
+      .modal-table::-webkit-scrollbar-thumb {
+        background: rgba(53, 122, 189, 0.5);
+        border-radius: 3px;
+      }
+      
+      .modal-table table {
+        min-width: 600px;
+        border-collapse: collapse;
+      }
+      
+      /* 手機版按鈕優化 */
+      .modal-actions .btn {
+        width: 100%;
+        margin-bottom: 10px;
+        padding: 15px;
+        font-size: 1.1em;
+      }
+      
+      /* 手機版比例容器優化 */
+      .ratio-container {
+        flex-direction: column;
+        gap: 15px;
+      }
+      
+      .ratio-item {
+        min-width: auto;
+        width: 100%;
+      }
+      
+      /* 手機版趨勢比較優化 */
+      .trend-comparison {
+        flex-direction: column;
+        gap: 15px;
+      }
+      
+      .trend-item {
+        width: 100%;
+      }
+    }
+    
+    /* 更小螢幕的額外優化 */
+    @media (max-width: 480px) {
+      .modal-content {
+        min-width: 98vw;
+        max-width: 98vw;
+        padding: 15px 10px;
+        margin: 5px;
+      }
+      
+      .modal-title {
+        font-size: 1.1em;
+        flex-direction: column;
+        gap: 8px;
+      }
+      
+      .modal-controls input[type="date"] {
+        font-size: 16px; /* 防止iOS縮放 */
+        padding: 12px;
+      }
+      
+      .modal-table {
+        font-size: 0.8em;
+      }
+      
+      .modal-table th,
+      .modal-table td {
+        padding: 6px 3px;
+        font-size: 0.75em;
+      }
+      
+      /* 手機版表格進一步優化 */
+      .modal-table table {
+        min-width: 500px;
+      }
+      
+      /* 手機版按鈕進一步優化 */
+      .modal-actions .btn {
+        padding: 18px;
+        font-size: 1.2em;
+        border-radius: 15px;
+      }
+      
+      /* 手機版關閉按鈕優化 */
+      .modal-close {
+        top: 10px;
+        right: 15px;
+        width: 35px;
+        height: 35px;
+        font-size: 1.3em;
+      }
+      
+      /* 手機版智能分析卡片優化 */
+      .analytics-card {
+        padding: 15px;
+        margin-bottom: 15px;
+      }
+      
+      .analytics-card h3 {
+        font-size: 1.1em;
+        margin-bottom: 15px;
+      }
+      
+      /* 手機版排行榜優化 */
+      .ranking-item {
+        padding: 10px 12px;
+        margin-bottom: 6px;
+      }
+      
+      .ranking-rank {
+        font-size: 1.1em;
+        min-width: 25px;
+      }
+      
+      .ranking-name {
+        font-size: 0.9em;
+      }
+      
+      .ranking-count {
+        font-size: 0.8em;
+      }
+      
+      .category-tag {
+        font-size: 0.7em;
+        padding: 2px 8px;
+      }
+      
+      /* 手機版觸控優化 */
+      .modal-controls label {
+        min-height: 44px; /* iOS建議的最小觸控區域 */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .modal-controls input[type="radio"] {
+        transform: scale(1.2); /* 放大單選按鈕 */
+        margin-right: 12px;
+      }
+      
+      /* 手機版表格觸控優化 */
+      .modal-table th,
+      .modal-table td {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      /* 手機版按鈕觸控優化 */
+      .btn {
+        min-height: 44px;
+        touch-action: manipulation; /* 防止雙擊縮放 */
+      }
+      
+      /* 手機版模態框觸控優化 */
+      .modal-close {
+        min-width: 44px;
+        min-height: 44px;
+        touch-action: manipulation;
+      }
+      
+      /* 手機版加油按鈕優化 */
+      .refuel-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 12px;
+        font-size: 1em;
+      }
+      
+      /* 手機版加油統計優化 */
+      #refuelStats {
+        margin: 15px 0;
+        padding: 12px;
+      }
+      
+      #refuelStatsContent {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+        font-size: 0.85em;
+      }
     }
     
     body.dark .heatmap-day.very-high {
@@ -1342,6 +1619,41 @@
       color: #357abd;
       min-width: 90px;
     }
+    
+    /* 分隔線樣式 */
+    .meta-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(53, 122, 189, 0.3), transparent);
+      margin: 12px 0;
+      border-radius: 1px;
+    }
+    
+    body.dark .meta-divider {
+      background: linear-gradient(90deg, transparent, rgba(255, 224, 130, 0.3), transparent);
+    }
+    
+    /* 時間和車輛區塊樣式 */
+    .time-section,
+    .vehicle-section {
+      margin-bottom: 15px;
+    }
+    
+    .time-header,
+    .vehicle-header {
+      font-size: 0.95em;
+      font-weight: 700;
+      color: #357abd;
+      margin-bottom: 8px;
+      padding: 6px 0;
+      border-bottom: 2px solid rgba(53, 122, 189, 0.2);
+      border-radius: 0 0 4px 4px;
+    }
+    
+    body.dark .time-header,
+    body.dark .vehicle-header {
+      color: #ffe082;
+      border-bottom-color: rgba(255, 224, 130, 0.2);
+    }
   </style>
   <script>
     function getMonday(d) { d = new Date(d); var day = d.getDay(), diff = d.getDate() - day + (day === 0 ? -6 : 1); return new Date(d.setDate(diff)); }
@@ -1472,27 +1784,54 @@
             km = Number(carEnd) - Number(carStart);
             if (isNaN(km)) km = '';
           }
-          // 專業表格排版
+          // 專業表格排版 - 用分隔線隔開時間和車輛資訊
+          html += `<div class="time-section">`;
+          html += `<div class="time-header">⏰ 出勤時間</div>`;
           html += `<table class=\"pro-summary-meta-table\">`;
           html += `<tr><td>🚗 出勤</td><td>${day.start || '-'}</td></tr>`;
           html += `<tr><td>🏁 回公司</td><td>${day.end || '-'}</td></tr>`;
+          html += `</table>`;
+          html += `</div>`;
+          
+          // 分隔線
+          html += `<div class="meta-divider"></div>`;
+          
+          html += `<div class="vehicle-section">`;
+          html += `<div class="vehicle-header">🚗 車輛資訊</div>`;
+          html += `<table class=\"pro-summary-meta-table\">`;
           html += `<tr><td>🔖 車牌</td><td>${day.car || '-'}</td></tr>`;
           html += `<tr><td>📍 出發公里數</td><td>${carStart || '-'}</td></tr>`;
           html += `<tr><td>🏁 回來公里數</td><td>${carEnd || '-'}</td></tr>`;
           html += `<tr><td>✏️ 公里數</td><td>${km === '' ? '-' : km}</td></tr>`;
           html += `</table>`;
+          html += `</div>`;
           if (day.refuel) {
             html += `<div class="pro-summary-refuel"><span class='icon'>⛽</span>已加油`;
             if(day.refuelKm || day.refuelLiters) {
-              html += `<span class='pro-summary-refuel-detail'>公里數：${day.refuelKm || '-'}，公升：${day.refuelLiters || '-'}</span>`;
+              html += `<span class='pro-summary-refuel-detail'>公里數：${day.refuelKm || '-'}，公升：${day.refuelLiters || '-'}`;
+              if(day.refuelAmount) {
+                html += `，金額：$${day.refuelAmount}`;
+              }
+              html += `</span>`;
             }
+            html += `</div>`;
+          } else {
+            // 添加加油按鈕
+            html += `<div class="pro-summary-refuel-section">`;
+            html += `<button type="button" class="refuel-btn" onclick="showRefuelModal('${emp.tableId}', ${dayIdx})">`;
+            html += `<span class='icon'>⛽</span>今日加油`;
+            html += `</button>`;
             html += `</div>`;
           }
           html += `</td>`;
         });
         html += `</tr></tbody></table>`;
-        // 新增本週總公里數
+        // 新增本週總公里數和加油統計
         let totalKm = 0;
+        let totalRefuelLiters = 0;
+        let totalRefuelAmount = 0;
+        let refuelCount = 0;
+        
         weekData.forEach(day => {
           const carStart = day.carStartKm || '';
           const carEnd = day.carEndKm || '';
@@ -1500,8 +1839,26 @@
             const km = Number(carEnd) - Number(carStart);
             if (!isNaN(km)) totalKm += km;
           }
+          
+          // 統計加油記錄
+          if (day.refuel) {
+            const liters = parseFloat(day.refuelLiters) || 0;
+            const amount = parseFloat(day.refuelAmount) || 0;
+            if (liters > 0) {
+              totalRefuelLiters += liters;
+              totalRefuelAmount += amount;
+              refuelCount++;
+            }
+          }
         });
-        html += `<div style='font-weight:700;color:#357abd;margin:12px 0 0 12px;'>本週總行駛公里數：${totalKm}</div>`;
+        
+        html += `<div style='font-weight:700;color:#357abd;margin:12px 0 0 12px;'>本週總行駛公里數：${totalKm} km`;
+        if (refuelCount > 0) {
+          const avgKmPerLiter = totalRefuelLiters > 0 ? (totalKm / totalRefuelLiters).toFixed(1) : 0;
+          const avgCostPerKm = totalKm > 0 ? (totalRefuelAmount / totalKm).toFixed(2) : 0;
+          html += ` | 加油${refuelCount}次，總${totalRefuelLiters}L，平均油耗${avgKmPerLiter}km/L，平均每公里$${avgCostPerKm}`;
+        }
+        html += `</div>`;
         html += `</div>`;
       });
       document.getElementById('summaryBlock').innerHTML = html;
@@ -1566,8 +1923,15 @@
       var closePlaceBtn = document.getElementById('closePlaceSummary');
       if(placeBtn && placeModal && closePlaceBtn) {
         placeBtn.onclick = function() {
-          renderPlaceSummary();
+          // 顯示載入狀態
+          document.getElementById('placeSummaryTable').innerHTML = 
+            '<div style="text-align: center; color: #357abd; padding: 40px; font-weight: 600;">載入地點統計中...</div>';
           placeModal.style.display = 'flex';
+          
+          // 延遲一下讓載入動畫顯示，然後執行統計
+          setTimeout(() => {
+            renderPlaceSummary();
+          }, 100);
         };
         closePlaceBtn.onclick = function() {
           placeModal.style.display = 'none';
@@ -1624,6 +1988,30 @@
           var wb = XLSX.utils.table_to_book(table, {sheet: "公里數彙整"});
           XLSX.writeFile(wb, '公里數彙整.xlsx');
         }
+      }
+      
+      // 加油模態框事件綁定
+      var refuelModal = document.getElementById('refuelModal');
+      var closeRefuelBtn = document.getElementById('closeRefuelModal');
+      var saveRefuelBtn = document.getElementById('saveRefuelBtn');
+      
+      if(refuelModal && closeRefuelBtn && saveRefuelBtn) {
+        closeRefuelBtn.onclick = function() {
+          refuelModal.style.display = 'none';
+        };
+        
+        saveRefuelBtn.onclick = function() {
+          saveRefuelRecord();
+        };
+        
+        refuelModal.onclick = function(e) {
+          if (e.target === refuelModal) refuelModal.style.display = 'none';
+        };
+        
+        // 加油輸入欄位即時計算
+        document.getElementById('refuelKm').addEventListener('input', calculateRefuelStats);
+        document.getElementById('refuelLiters').addEventListener('input', calculateRefuelStats);
+        document.getElementById('refuelAmount').addEventListener('input', calculateRefuelStats);
       }
     });
     // 主題切換
@@ -1752,8 +2140,14 @@
     // --- END 修正版 renderMileageSummary ---
     // 地點統計功能
     function renderPlaceSummary() {
-      const list = getEmployeeList();
-      const summaryType = document.querySelector('input[name="placeSummaryType"]:checked').value;
+      try {
+        const list = getEmployeeList();
+        const summaryTypeElement = document.querySelector('input[name="placeSummaryType"]:checked');
+        if (!summaryTypeElement) {
+          console.error('找不到地點統計類型選擇器');
+          return;
+        }
+        const summaryType = summaryTypeElement.value;
       
       if (summaryType === 'all') {
         // 全部統計
@@ -1832,6 +2226,11 @@
         });
         html += `</tbody></table>`;
         document.getElementById('placeSummaryTable').innerHTML = html;
+      }
+      } catch(e) {
+        console.error('地點統計發生錯誤：', e);
+        document.getElementById('placeSummaryTable').innerHTML = 
+          '<div style="text-align: center; color: #666; padding: 40px;">載入地點統計時發生錯誤，請重新整理頁面</div>';
       }
     }
     // 智能分析功能
@@ -2309,6 +2708,111 @@
       localStorage.setItem(key, JSON.stringify(data));
     }
     
+    // 加油模態框相關變數
+    let currentRefuelTableId = '';
+    let currentRefuelDayIdx = -1;
+    
+    // 顯示加油模態框
+    function showRefuelModal(tableId, dayIdx) {
+      currentRefuelTableId = tableId;
+      currentRefuelDayIdx = dayIdx;
+      
+      // 清空輸入欄位
+      document.getElementById('refuelKm').value = '';
+      document.getElementById('refuelLiters').value = '';
+      document.getElementById('refuelAmount').value = '';
+      document.getElementById('refuelStats').style.display = 'none';
+      
+      // 顯示模態框
+      document.getElementById('refuelModal').style.display = 'flex';
+    }
+    
+    // 計算油耗統計
+    function calculateRefuelStats() {
+      const refuelKm = parseFloat(document.getElementById('refuelKm').value) || 0;
+      const refuelLiters = parseFloat(document.getElementById('refuelLiters').value) || 0;
+      const refuelAmount = parseFloat(document.getElementById('refuelAmount').value) || 0;
+      
+      if (refuelKm > 0 && refuelLiters > 0) {
+        const data = loadTable(currentRefuelTableId);
+        let totalKm = 0;
+        let totalLiters = 0;
+        let totalAmount = 0;
+        let refuelCount = 0;
+        
+        // 計算本週所有加油記錄
+        data.forEach(day => {
+          if (day.refuel) {
+            const km = parseFloat(day.refuelKm) || 0;
+            const liters = parseFloat(day.refuelLiters) || 0;
+            const amount = parseFloat(day.refuelAmount) || 0;
+            
+            if (km > 0 && liters > 0) {
+              totalKm += km;
+              totalLiters += liters;
+              totalAmount += amount;
+              refuelCount++;
+            }
+          }
+        });
+        
+        // 加上本次加油
+        totalKm += refuelKm;
+        totalLiters += refuelLiters;
+        totalAmount += refuelAmount;
+        refuelCount++;
+        
+        // 計算平均油耗
+        const avgKmPerLiter = totalLiters > 0 ? (totalKm / totalLiters).toFixed(1) : 0;
+        const avgCostPerKm = totalKm > 0 ? (totalAmount / totalKm).toFixed(2) : 0;
+        const avgCostPerLiter = totalLiters > 0 ? (totalAmount / totalLiters).toFixed(2) : 0;
+        
+        let statsHtml = '<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 0.9em;">';
+        statsHtml += `<div><strong>本週總公里數：</strong>${totalKm} km</div>`;
+        statsHtml += `<div><strong>本週總加油量：</strong>${totalLiters} L</div>`;
+        statsHtml += `<div><strong>本週總金額：</strong>$${totalAmount}</div>`;
+        statsHtml += `<div><strong>加油次數：</strong>${refuelCount} 次</div>`;
+        statsHtml += `<div><strong>平均油耗：</strong>${avgKmPerLiter} km/L</div>`;
+        statsHtml += `<div><strong>平均每公里成本：</strong>$${avgCostPerKm}</div>`;
+        statsHtml += `<div><strong>平均每公升成本：</strong>$${avgCostPerLiter}</div>`;
+        statsHtml += `<div><strong>本次加油油耗：</strong>${refuelLiters > 0 ? (refuelKm / refuelLiters).toFixed(1) : 0} km/L</div>`;
+        statsHtml += '</div>';
+        
+        document.getElementById('refuelStatsContent').innerHTML = statsHtml;
+        document.getElementById('refuelStats').style.display = 'block';
+      } else {
+        document.getElementById('refuelStats').style.display = 'none';
+      }
+    }
+    
+    // 儲存加油記錄
+    function saveRefuelRecord() {
+      const refuelKm = document.getElementById('refuelKm').value;
+      const refuelLiters = document.getElementById('refuelLiters').value;
+      const refuelAmount = document.getElementById('refuelAmount').value;
+      
+      if (!refuelKm || !refuelLiters) {
+        alert('請至少輸入加油公里數和公升數');
+        return;
+      }
+      
+      const data = loadTable(currentRefuelTableId);
+      if (data[currentRefuelDayIdx]) {
+        data[currentRefuelDayIdx].refuel = true;
+        data[currentRefuelDayIdx].refuelKm = refuelKm;
+        data[currentRefuelDayIdx].refuelLiters = refuelLiters;
+        data[currentRefuelDayIdx].refuelAmount = refuelAmount;
+        
+        saveTable(currentRefuelTableId, data);
+        renderSummaryBlock();
+        
+        // 關閉模態框
+        document.getElementById('refuelModal').style.display = 'none';
+        
+        alert('加油記錄已儲存！');
+      }
+    }
+    
     // 新增缺少的 showRoutePhotoModal 函數
     function showRoutePhotoModal(photoUrl) {
       const modal = document.createElement('div');
@@ -2463,6 +2967,45 @@
         <button id="exportPlaceExcel" class="btn btn-success">
           <span>📥</span>
           匯出 Excel
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 加油模態框 -->
+  <div id="refuelModal" class="modal-overlay">
+    <div class="modal-content">
+      <button id="closeRefuelModal" class="modal-close">✖</button>
+      
+      <div class="modal-title">
+        <span>⛽</span>
+        今日加油記錄
+      </div>
+      
+      <div class="modal-controls">
+        <label>
+          加油公里數
+          <input type="number" id="refuelKm" placeholder="請輸入加油時的公里數" min="0">
+        </label>
+        <label>
+          加油公升數
+          <input type="number" id="refuelLiters" placeholder="請輸入加油公升數" min="0" step="0.1">
+        </label>
+        <label>
+          加油金額
+          <input type="number" id="refuelAmount" placeholder="請輸入加油金額" min="0" step="1">
+        </label>
+      </div>
+      
+      <div id="refuelStats" style="margin: 20px 0; padding: 15px; background: rgba(53, 122, 189, 0.1); border-radius: 12px; display: none;">
+        <h4 style="margin: 0 0 10px 0; color: #357abd;">📊 油耗統計</h4>
+        <div id="refuelStatsContent"></div>
+      </div>
+      
+      <div class="modal-actions">
+        <button id="saveRefuelBtn" class="btn btn-success">
+          <span>💾</span>
+          儲存加油記錄
         </button>
       </div>
     </div>
