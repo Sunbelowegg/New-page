@@ -804,6 +804,14 @@
       /* 手機版顯示當前日期時間 */
       .current-date-mobile {
         display: block;
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+      }
+      
+      .current-date-mobile .btn {
+        align-self: stretch;
+        margin-left: 0 !important;
       }
     }
     
@@ -891,6 +899,12 @@
       <div class="current-date-mobile" id="currentDateMobile">
         📅 今天：<span id="currentDateText"></span>
         <span class="current-time" id="currentTimeText"></span>
+        <div id="todayScheduleInfo" style="background: rgba(53, 122, 189, 0.1); padding: 10px; border-radius: 8px; border-left: 4px solid #357abd; font-size: 0.9em; color: #357abd; margin-top: 10px; display: none;">
+          📍 今天會自動跳轉到對應的行程表
+        </div>
+        <button class="btn btn-primary" onclick="scrollToTodaySchedule()" style="margin-left: 10px; padding: 8px 16px; font-size: 0.9em;">
+          📍 跳轉到今天
+        </button>
       </div>
       
       <div id="employeeSchedule"></div>
@@ -1086,6 +1100,10 @@
       const container = document.getElementById('employeeSchedule');
       container.innerHTML = '';
       
+      // 獲取今天的日期
+      const today = new Date();
+      const todayDayOfWeek = today.getDay(); // 0=週日, 1=週一, ..., 6=週六
+      
       weekData.forEach((day, dayIdx) => {
         const dayBlock = document.createElement('div');
         dayBlock.className = 'day-block';
@@ -1093,7 +1111,16 @@
         // 標題
         const dayTitle = document.createElement('div');
         dayTitle.className = 'day-title';
-        dayTitle.innerHTML = `<span class="icon">📅</span>${day.date}`;
+        
+        // 檢查是否為今天（週一到週五）
+        const isToday = (todayDayOfWeek >= 1 && todayDayOfWeek <= 5) && (dayIdx === todayDayOfWeek - 1);
+        
+        if (isToday) {
+          dayTitle.innerHTML = `<span class="icon">📅</span>${day.date} <span style="background: #ff6b6b; color: white; padding: 4px 8px; border-radius: 8px; font-size: 0.8em; margin-left: 10px;">今天</span>`;
+        } else {
+          dayTitle.innerHTML = `<span class="icon">📅</span>${day.date}`;
+        }
+        
         dayBlock.appendChild(dayTitle);
         
         // 出勤、回公司、車牌
@@ -1365,6 +1392,51 @@
       }
     }
     
+    // 自動跳轉到今天的行程表（手機版）
+    function scrollToTodaySchedule() {
+      const today = new Date();
+      const dayOfWeek = today.getDay(); // 0=週日, 1=週一, ..., 6=週六
+      
+      // 只處理週一到週五 (1-5)
+      if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+        // 計算在行程表中的索引 (週一=0, 週二=1, ..., 週五=4)
+        const dayIndex = dayOfWeek - 1;
+        
+        // 顯示手機版提示信息
+        const todayInfo = document.getElementById('todayScheduleInfo');
+        if (todayInfo && window.innerWidth <= 768) {
+          const dayNames = ['週一', '週二', '週三', '週四', '週五'];
+          todayInfo.textContent = `📍 今天(${dayNames[dayIndex]})會自動跳轉到對應的行程表`;
+          todayInfo.style.display = 'block';
+        }
+        
+        // 等待DOM渲染完成後執行滾動
+        setTimeout(() => {
+          const dayBlocks = document.querySelectorAll('.day-block');
+          if (dayBlocks[dayIndex]) {
+            // 只在手機版自動滾動
+            if (window.innerWidth <= 768) {
+              // 平滑滾動到今天的行程表
+              dayBlocks[dayIndex].scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+              });
+            }
+            
+            // 添加高亮效果（手機版和桌面版都顯示）
+            dayBlocks[dayIndex].style.border = '3px solid #357abd';
+            dayBlocks[dayIndex].style.boxShadow = '0 0 20px rgba(53, 122, 189, 0.3)';
+            
+            // 3秒後移除高亮效果
+            setTimeout(() => {
+              dayBlocks[dayIndex].style.border = '';
+              dayBlocks[dayIndex].style.boxShadow = '';
+            }, 3000);
+          }
+        }, 500);
+      }
+    }
+    
     // 初始化
     document.addEventListener('DOMContentLoaded', function() {
       cleanupOtherEmployees(); // 清理其他員工資料
@@ -1373,12 +1445,17 @@
       renderEmployeeSchedule();
       updateCurrentDateTime(); // 更新當前日期時間
       
+      // 自動跳轉到今天的行程表
+      scrollToTodaySchedule();
+      
       // 每秒更新時間
       setInterval(updateCurrentDateTime, 1000);
       
       document.getElementById('weekSelect').addEventListener('change', function() {
         localStorage.setItem('selectedWeek', this.value);
         renderEmployeeSchedule();
+        // 週次改變後重新跳轉到今天的行程表
+        setTimeout(scrollToTodaySchedule, 100);
       });
       
       // 模態框事件監聽器
