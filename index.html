@@ -733,7 +733,7 @@
       }
     }
     
-    /* 手機版當前日期顯示 */
+    /* 手機版當前日期時間顯示 */
     .current-date-mobile {
       display: none;
       background: linear-gradient(135deg, #357abd, #4a90e2);
@@ -750,6 +750,13 @@
     
     body.dark .current-date-mobile {
       background: linear-gradient(135deg, #2d323a, #3a4149);
+    }
+    
+    .current-time {
+      font-size: 0.9em;
+      opacity: 0.9;
+      margin-top: 5px;
+      display: block;
     }
     
     @media (max-width: 900px) {
@@ -794,7 +801,7 @@
         margin-top: 10px;
       }
       
-      /* 手機版顯示當前日期 */
+      /* 手機版顯示當前日期時間 */
       .current-date-mobile {
         display: block;
       }
@@ -880,9 +887,10 @@
         </div>
       </div>
       
-      <!-- 手機版當前日期顯示 -->
+      <!-- 手機版當前日期時間顯示 -->
       <div class="current-date-mobile" id="currentDateMobile">
         📅 今天：<span id="currentDateText"></span>
+        <span class="current-time" id="currentTimeText"></span>
       </div>
       
       <div id="employeeSchedule"></div>
@@ -1299,19 +1307,36 @@
       document.getElementById(modalId).style.display = 'none';
     }
     
-    // 更新當前日期顯示
-    function updateCurrentDate() {
+    // 更新當前日期時間顯示
+    function updateCurrentDateTime() {
       const now = new Date();
-      const options = { 
+      
+      // 日期格式
+      const dateOptions = { 
         year: 'numeric', 
         month: 'long', 
         day: 'numeric', 
         weekday: 'long' 
       };
-      const dateText = now.toLocaleDateString('zh-TW', options);
+      const dateText = now.toLocaleDateString('zh-TW', dateOptions);
+      
+      // 時間格式
+      const timeOptions = {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+      };
+      const timeText = now.toLocaleTimeString('zh-TW', timeOptions);
+      
       const currentDateText = document.getElementById('currentDateText');
+      const currentTimeText = document.getElementById('currentTimeText');
+      
       if (currentDateText) {
         currentDateText.textContent = dateText;
+      }
+      if (currentTimeText) {
+        currentTimeText.textContent = `🕐 ${timeText}`;
       }
     }
     
@@ -1346,7 +1371,10 @@
       renderUserSelect();
       renderWeekSelect();
       renderEmployeeSchedule();
-      updateCurrentDate(); // 更新當前日期
+      updateCurrentDateTime(); // 更新當前日期時間
+      
+      // 每秒更新時間
+      setInterval(updateCurrentDateTime, 1000);
       
       document.getElementById('weekSelect').addEventListener('change', function() {
         localStorage.setItem('selectedWeek', this.value);
